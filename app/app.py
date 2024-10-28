@@ -9,7 +9,11 @@ def parse_requests(req_data):
 
     elif path.startswith("/echo/"):
         value = path.split("/echo/")[1]
-        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(value)}\r\n\r\n{value}".encode()
+        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(value)}\r\n\r\n{value}"
+
+    elif path == "/uer-agent":
+        useragent = lines[2].split(": ")[1]
+        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(useragent)}\r\n\r\n{useragent}"
         
     else:
         response = "HTTP/1.1 404 Not Found\r\n\r\n"
