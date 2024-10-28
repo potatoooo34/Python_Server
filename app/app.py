@@ -1,4 +1,5 @@
 import socket  # noqa: F401
+import threading
 
 def parse_requests(req_data):
     lines = req_data.split('\r\n')
@@ -11,7 +12,7 @@ def parse_requests(req_data):
         value = path.split("/echo/")[1]
         response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(value)}\r\n\r\n{value}"
 
-    elif path == "/uer-agent":
+    elif path == "/user-agent":
         useragent = lines[2].split(": ")[1]
         response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(useragent)}\r\n\r\n{useragent}"
         
@@ -32,21 +33,26 @@ def handle_requests(client_socket):
     
     client_socket.send(response.encode())
 
+def client_thread(conn , addr):
+    print(f"Connection from {addr} extablished")
+    handle_requests(conn)
+
 
 def main():
     
     
     
-    server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
+    server_socket = socket.create_server(("localhost", 4221))
+    server_socket.listen()
  
     try:
         while True:
             print("Waiting for a conection...")
             client_socket , addr = server_socket.accept()
 
-            print(f"Connection from {addr} established")
-            handle_requests(client_socket)
-            client_socket.close()
+            threading.Thread(target = client_thread , args = (client_socket , addr)).start()
+            
+            
 
 
     except KeyboardInterrupt:
